@@ -33,8 +33,11 @@ Zapisany plik mogłam otworzyć w narzędziu Sysmon View, które umożliwia leps
 
 ## Wysyłanie logów z Sysmona do Security Onion
 
-W tym celu wykorzystałam Winlogbeata. Pobrałam go ze strony: https://www.elastic.co/downloads/beats/winlogbeat. Następnie edytowałam plik konfiguracyjny.
-Sprawdziłam jego poprawność komendą: 
+W tym celu wykorzystałam Winlogbeata. Pobrałam go ze strony: https://www.elastic.co/downloads/beats/winlogbeat . Następnie edytowałam plik konfiguracyjny. Ustawiłam setup Kibany oraz output: Logstash.
+
+![image]()
+
+Sprawdziłam poprawność konfiguracji komendą: 
 ```
 .\winlogbeat.exe test config -c .\winlogbeat.yml -e
 ```
