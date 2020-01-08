@@ -5,8 +5,11 @@
 # Zadanie 1
 ## Instalacja i konfiguracja Sysmona
 
-Sysmona zainstalowałam, pobierając folder ze strony:
-Następnie skonfigurowałam plik
+Sysmona zainstalowałam, pobierając folder ze strony: https://github.com/SwiftOnSecurity/sysmon-config
+Następnie skonfigurowałam plik i zainstalowałam Sysmona komendą:
+```
+sysmon.exe -accepteula -i sysmonconfig-export.xml
+```
 
 Sysmon automatycznie gromadzi logi, które można zaobserwować i przeglądać, wchodząc w: 
 Podgląd zdarzeń->Dzienniki aplikacji i usług->Microsoft->Windows->Sysmon->Operational
@@ -29,3 +32,16 @@ Zapisany plik mogłam otworzyć w narzędziu Sysmon View, które umożliwia leps
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/event_hierarchy.PNG)
 
 ## Wysyłanie logów z Sysmona do Security Onion
+
+W tym celu wykorzystałam Winlogbeata. Pobrałam go ze strony: https://www.elastic.co/downloads/beats/winlogbeat. Następnie edytowałam plik konfiguracyjny.
+Sprawdziłam jego poprawność komendą: 
+```
+.\winlogbeat.exe test config -c .\winlogbeat.yml -e
+```
+I uruchomiłam usługę:
+```
+start-service winlogbeat 
+```
+Do Kibany przesłane zostały logi z Sysmona, które pojawiły się na Dashboardzie.
+
+W zakładce Discover znajduje się zestawienie i szczegóły dotyczące tych logów. Znaczna większość dotyczny `event ID 10`, czyli `Process accessed`. 
