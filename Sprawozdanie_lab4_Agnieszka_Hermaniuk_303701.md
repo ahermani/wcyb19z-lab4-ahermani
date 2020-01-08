@@ -35,7 +35,9 @@ Zapisany plik mogłam otworzyć w narzędziu Sysmon View, które umożliwia leps
 
 W tym celu wykorzystałam Winlogbeata. Pobrałam go ze strony: https://www.elastic.co/downloads/beats/winlogbeat . Następnie edytowałam plik konfiguracyjny. Ustawiłam setup Kibany oraz output: Logstash.
 
-![image]()
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/setup_kibana.PNG)
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/output_logstash.PNG)
 
 Sprawdziłam poprawność konfiguracji komendą: 
 ```
@@ -47,4 +49,6 @@ start-service winlogbeat
 ```
 Do Kibany przesłane zostały logi z Sysmona, które pojawiły się na Dashboardzie.
 
-W zakładce Discover znajduje się zestawienie i szczegóły dotyczące tych logów. Znaczna większość dotyczny `event ID 10`, czyli `Process accessed`. 
+W zakładce Discover znajduje się zestawienie i szczegóły dotyczące tych logów. Po rozwinięciu można sprawdzić takie cechy, jak:...Znaczna większość dotyczy `event ID 10`, czyli `Process accessed`, czyli gdy jakiś proces otwiera nowy proces. Warto w tym wypadku sprawdzić `SourceImage` oraz `TargetImage`. Zagrożeniem może być najczęściej, gdy zobaczymy, że uruchomiany był przez PowerShella Lsass.exe, co może być dokonane w celu kradzieży poświadczeń do ataktu Pass-the-Hash. Sytuacja taka może wyglądać np. gdy targetem jest lsass.exe, a sourcem mimikatz. W moim wypadku proces ten zawsze uruchamiany był z systemowego pliku svchost.exe.
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/win_kibana.PNG)
