@@ -171,14 +171,25 @@ sudo iptables -A OUTPUT -p tcp --dport 22 -j DROP
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/fail2ban_iptables.PNG)
 
 ### Debsums
-Debsums to narzędzie pozwalające zweryfikować spójność zainstalowanych plików pakietów, pod względem sum kontrolnych dostarczonych przez pakiet lub wygenerowanych z archiwum .deb.
+Debsums to narzędzie pozwalające zweryfikować spójność zainstalowanych plików pakietów, pod względem sum kontrolnych dostarczonych przez pakiet lub wygenerowanych z archiwum .deb. Dzięki niemu możemy stwierdzić, czy pliki na naszym dysku zostały zmodyfikowane.
+
 Zainstalowałam narzędzie komendą: `sudo apt-get install debsums`. 
+
 Użycie programu jest dość proste, komenda: `sudo debsums` analizuje wszystkie zainstalowane pakiety (bez plików konfiguracyjnych). Sprawdzenie tych plików możemy jednak wymusić, dopisując `-a`, z kolei opcja `-s` zwraca nam tylko wyniki z błędami, a `-c` tylko zmienione pliki.
 
-W moim przypadku komendy wywołujące dwie sotatnie opcje nie zwróciły nic.
+W moim przypadku komendy wywołujące dwie ostatnie opcje nie zwróciły nic.
 
 Fragment wyniku komendy `sudo debsums`:
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/sudo_debsums.PNG)
 
+### Blokowanie pakietów z flagami 
+Zablokowałam wysyłanie pakietów SYN, XMAS i z flagą NULL, a także ustawiłam limit na przesyłanie pakietów ICMP echo broadcast.
+Uzyłam następujących komend dopisujących reguły do firewalla:
+* `sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP` - zablokowanie pakietów SYN
+* `sudo iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP` - zablokowanie pakietów z flagą XMAS
+* `sudo iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP` - zablokowanie pakietów z flagą NULL
+* `sudo iptables -A INPUT -p icmp -m limit --limit 2/second --limit-burst 2 -j ACCEPT` - limit ICMP
 
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/block_packets.PNG)
