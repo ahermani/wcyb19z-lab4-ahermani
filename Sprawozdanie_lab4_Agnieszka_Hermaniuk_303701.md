@@ -113,7 +113,20 @@ sudo iptables -A OUTPUT -p tcp -m tcp --dport 1883 -j ACCEPT
 sudo iptables -A OUTPUT -p tcp -m tcp --dport 8883 -j ACCEPT
 ```
 
-## Fail2Ban
+## Best Practices hardeningu systemu
+* silne loginy i hasła (minimum 8 znaków, w tym duże znaki i znaki specjalne)
+* używanie niestandardowego portu dla SSH (zamiast 22)
+* zablokowanie nieużywanych portów
+* używanie klucza SSH do autoryzacji
+* zmniejszenie liczby użytkowników, którzy mają możliwy zdalny dostęp
+* dezaktywowanie logowania na roota przez SSH
+* zablokowanie możliwości wysyłania flag i pingowania
+* zablokowanie prób bruteforcowania haseł do SSH (przez Fail2Ban)
+* ustawienie automatycznego zakończenia sesji po odpowiednim czasie braku aktywności
+* dozwolenie dostępu do SSH tylko dla określonego adresu IP
+* regularne aktualizacje
+
+### Fail2Ban
 Fail2Ban to 
 Instalujemy go komendą: `sudo apt-get install fail2ban`.
 
@@ -146,3 +159,26 @@ Podstawowymi opcjami, na które należałoby zwrócić uwagę w podstawowej konf
 Warto też przejść do sekcji `JAILS` i zmienić domyślny port usługi SSH.
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/change_ssh.PNG)
+
+Po zapisaniu zmian w pliku zrestartowałam fail2ban komendą `sudo systemctl restart fail2ban`.
+
+Teraz należało zablokować nieużywany już port 22, wpisując komendy:
+```
+sudo iptables -A INPUT -p tcp --dport 22 -j DROP
+sudo iptables -A OUTPUT -p tcp --dport 22 -j DROP
+```
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/fail2ban_iptables.PNG)
+
+### Debsums
+Debsums to narzędzie pozwalające zweryfikować spójność zainstalowanych plików pakietów, pod względem sum kontrolnych dostarczonych przez pakiet lub wygenerowanych z archiwum .deb.
+Zainstalowałam narzędzie komendą: `sudo apt-get install debsums`. 
+Użycie programu jest dość proste, komenda: `sudo debsums` analizuje wszystkie zainstalowane pakiety (bez plików konfiguracyjnych). Sprawdzenie tych plików możemy jednak wymusić, dopisując `-a`, z kolei opcja `-s` zwraca nam tylko wyniki z błędami, a `-c` tylko zmienione pliki.
+
+W moim przypadku komendy wywołujące dwie sotatnie opcje nie zwróciły nic.
+
+Fragment wyniku komendy `sudo debsums`:
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/sudo_debsums.PNG)
+
+
