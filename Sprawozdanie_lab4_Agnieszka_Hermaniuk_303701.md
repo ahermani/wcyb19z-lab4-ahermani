@@ -87,20 +87,62 @@ sudo iptables -A INPUT -p tcp -m tcp --dport 443 -j ACCEPT
 
 Sprawdziłam aktualnie akceptowane porty poleceniem `sudo iptables -L -n`
 
-![image]()
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/current_80_443.PNG)
 
 
 Dopuszczenie ruchu SSH tylko dla mojej maszyny wykonałam analogicznie, do poprzedniej części zadania, z uwzględnieniem portu usługi SSH (`port 22`) oraz source adresu IP (`168.62.40.165`).
 Użyłam więc komendy:
 ```
-sudo iptables -A INPUT -p tcp -s 168.62.40.165 -m tcp --dport 22 -j ACCEPT
+sudo iptables -A INPUT -p tcp -s 88.156.140.65 -m tcp --dport 22 -j ACCEPT
 ```
 I ponownie wyświetliłam bieżący łańcuch firewalla.
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/allow_SSH.PNG)
 
-Żwby zablokować wszystkie nieużywane porty (czyli pozostałe porty), należy użyć komend:
+Żeby zablokować wszystkie nieużywane porty (czyli pozostałe porty), należy użyć komend:
 ```
 sudo iptables -P INPUT DROP
 sudo iptables -P OUTPUT DROP
 ```
+
+MQTT
+```
+sudo iptables -A INPUT -p tcp -m tcp --dport 1883 -j ACCEPT
+sudo iptables -A INPUT -p tcp -m tcp --dport 8883 -j ACCEPT
+sudo iptables -A OUTPUT -p tcp -m tcp --dport 1883 -j ACCEPT
+sudo iptables -A OUTPUT -p tcp -m tcp --dport 8883 -j ACCEPT
+```
+
+## Fail2Ban
+Fail2Ban to 
+Instalujemy go komendą: `sudo apt-get install fail2ban`.
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/fail2ban_install.PNG)
+
+Następnie kopiujemy podstawowy plik konfiguracyjny pod nową nazwą (w ten sposób unikamy możliwości nadpisania pliku z naszymi preferencjami np. po aktualizacji).
+```
+sudo cp /etc/fail2ban/jail.conf /etc/fail2ban/jail.local
+```
+Teraz należy skonfigurować plik w edytorze
+
+```
+sudo nano /etc/fail2ban/jail.local
+```
+
+Podstawowymi opcjami, na które należałoby zwrócić uwagę w podstawowej konfiguracji są:
+
+* ignoreip - adresy, które wyłączone są z zasad fail2ban (od razu ustawiony
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/ignore_ip.PNG)
+
+* bantime - określa jak długo ( w sekundach) ban będzie aktywny
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/bantime.PNG)
+
+* maxretry - domyślna ilość prób połączenia, zanim ban zostanie nałożony na adres IP
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/maxretry.PNG)
+
+Warto też przejść do sekcji `JAILS` i zmienić domyślny port usługi SSH.
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/change_ssh.PNG)
