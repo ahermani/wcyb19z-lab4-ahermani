@@ -177,12 +177,18 @@ Następnie wyświetliłam klucz poleceniem:
 ```
 cat ~/.ssh/id_rsa.pub
 ```
-Klucz podałam na etapie tworzenia maszyny wirtualnej i od początku logowałam się przy jego użyciu. Można jednak przejść z logowania hasłem na logowanie przy użyciu kluczy SSH podczas użytkowania stworzonej już maszyny.
-Należy zmienić rodzaj uwierzytelnienia w pliku `sshd_config`.
+Klucz podałam na etapie tworzenia maszyny wirtualnej i od początku logowałam się przy jego użyciu. Można jednak przejść z logowania hasłem na logowanie przy użyciu kluczy SSH podczas użytkowania stworzonej już maszyny. Po utworzeniu klucza należy zmienić rodzaj uwierzytelnienia w pliku `sshd_config`.
 ```
 sudo nano /etc/ssh/sshd_config
 ```
-![image]()
+
+Ustawić `PasswordAuthentication` na `no`:
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/no_password.PNG)
+
+Upewnić się, że `PubkeyAuthentication` ustawione jest na `yes`:
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/pub_key_auth.PNG)
 
 Następnie używamy polecenia:
 ```
