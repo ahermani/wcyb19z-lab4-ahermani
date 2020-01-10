@@ -3,20 +3,24 @@
 # Agnieszka Hermaniuk, nr albumu 303701, e-mail: 01149363@pw.edu.pl
 
 # Zadanie 1
-## Instalacja i konfiguracja Sysmona
 
-Sysmona zainstalowałam, pobierając folder ze strony: https://github.com/SwiftOnSecurity/sysmon-config
-Następnie skonfigurowałam plik i zainstalowałam Sysmona komendą:
+Do realizacji zadania zainstalowałam na VirtualBoxie wirualnego hosta Security Onion (https://github.com/Security-Onion-Solutions/security-onion/blob/master/Verify_ISO.md) oraz Windows 10 w ramach możliwości konta Azure for Students.
+
+## Skonfigurować generowanie logów systemowych systemu Windows - Sysmon
+
+Sysmona zainstalowałam, pobierając folder ze strony: https://github.com/SwiftOnSecurity/sysmon-config .
+Następnie skonfigurowałam plik (`sysmonconfig-export.xml` - załączony do repozytorium) i zainstalowałam Sysmona komendą:
 ```
 sysmon.exe -accepteula -i sysmonconfig-export.xml
 ```
 
-Sysmon automatycznie gromadzi logi, które można zaobserwować i przeglądać, wchodząc w: 
+Sysmon automatycznie gromadzi logi, które można zaobserwować, przeglądać i filtrować, wchodząc w: 
+
 Podgląd zdarzeń->Dzienniki aplikacji i usług->Microsoft->Windows->Sysmon->Operational
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/event_log.PNG)
 
-Zgromadzone logi zapisałam do pliku komendą:
+Zgromadzone logi zapisałam do pliku komendą, aby mieć później możliwość wyeksportowania go do narzędzia Sysmon View:
 ```
 WEVTUtil query-events "Microsoft-Windows-Sysmon/Operational" /format:xml /e:sysmonview > C:\Users\01149363\Desktop\Sysmon\eventlog.xml
 ```
@@ -25,15 +29,33 @@ Widok pliku:
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/sysmon_file.PNG)
 
-Zapisany plik mogłam otworzyć w narzędziu Sysmon View, które umożliwia lepszą wizualizację, a tym samym analizę logów, posiadając takie opcje jak: korelowanie i grupowanie zebranych logów, zbudowanie drzewka hierarchii, czy też przedstawianie wyników na mapie na podstawie geolokalizacji adresów IP.
+Zapisany plik mogłam otworzyć w Sysmon View, które umożliwia lepszą wizualizację, a tym samym analizę logów, posiadając takie opcje jak: korelowanie i grupowanie zebranych logów na podstawie ich nazw, identyfikatorów GUID czy czas powstania wydarzeń, zbudowanie drzewka hierarchii, czy też przedstawianie wyników na mapie na podstawie geolokalizacji adresów IP (bardziej czasochłonna opcja).
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/all_events_log.PNG)
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/event_hierarchy.PNG)
 
-## Wysyłanie logów z Sysmona do Security Onion
+## Skonfigurować wysyłanie logów sysmon do Security Onion.
 
-W tym celu wykorzystałam Winlogbeata. Pobrałam go ze strony: https://www.elastic.co/downloads/beats/winlogbeat . Następnie edytowałam plik konfiguracyjny. Ustawiłam setup Kibany oraz output: Logstash.
+W tym celu wykorzystałam program Winlogbeat. Pobrałam go ze strony: https://www.elastic.co/downloads/beats/winlogbeat . 
+
+Zainstalowałam program, wpisując w PowerShellu komendę:
+```
+PowerShell.exe -ExecutionPolicy UnRestricted -File .\install-service-winlogbeat.ps1
+```
+
+Następnie edytowałam plik konfiguracyjny (`winlogbeat.yml`), w którym należało odpowiednio ustawić setup kibany oraz output dla wysyłanych logów. 
+  
+  * Kibana
+  ```
+  setupt.kibana:
+  host: [https://192.168.10.108/app/kibana]
+  ```
+  * Logstash
+  ```
+  output.logstash:
+  hosts: ["192.168.10.108:5044"]
+  ```
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/setup_kibana.PNG)
 
@@ -43,15 +65,22 @@ Sprawdziłam poprawność konfiguracji komendą:
 ```
 .\winlogbeat.exe test config -c .\winlogbeat.yml -e
 ```
-I uruchomiłam usługę:
+Zwróciła ona `Config OK`, zatem można było przejść do uruchomienia usługi, co wykonałam komendą:
 ```
 start-service winlogbeat 
 ```
-Do Kibany przesłane zostały logi z Sysmona, które pojawiły się na Dashboardzie.
 
-W zakładce Discover znajduje się zestawienie i szczegóły dotyczące tych logów. Po rozwinięciu można sprawdzić takie cechy, jak:...Znaczna większość dotyczy `event ID 10`, czyli `Process accessed`, czyli gdy jakiś proces otwiera nowy proces. Warto w tym wypadku sprawdzić `SourceImage` oraz `TargetImage`. Zagrożeniem może być najczęściej, gdy zobaczymy, że uruchomiany był przez PowerShella Lsass.exe, co może być dokonane w celu kradzieży poświadczeń do ataktu Pass-the-Hash. Sytuacja taka może wyglądać np. gdy targetem jest lsass.exe, a sourcem mimikatz. W moim wypadku proces ten zawsze uruchamiany był z systemowego pliku svchost.exe.
+## Zaobserowować działanie za pomocą UI dostępnego w Security Onion - Kibana
+
+Do Kibany przesłane zostały logi z Sysmona, co można było zauważyć już w zakładce `Dashboard`.
+
+W zakładce Discover znajduje się zestawienie i szczegóły dotyczące tych logów. 
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/win_kibana.PNG)
+
+Po rozwinięciu można sprawdzić takie cechy, jak:...Znaczna większość dotyczy `event ID 10`, czyli `Process accessed`, czyli gdy jakiś proces otwiera nowy proces. Warto w tym wypadku sprawdzić `SourceImage` oraz `TargetImage`. Zagrożeniem może być najczęściej, gdy zobaczymy, że uruchomiany był przez PowerShella Lsass.exe, co może być dokonane w celu kradzieży poświadczeń do ataktu Pass-the-Hash. Sytuacja taka może wyglądać np. gdy targetem jest lsass.exe, a sourcem mimikatz. W moim wypadku proces ten zawsze uruchamiany był z systemowego pliku svchost.exe.
+
+
 
 # Zadanie 2
 
