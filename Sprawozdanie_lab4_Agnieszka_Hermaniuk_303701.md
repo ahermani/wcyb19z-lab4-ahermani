@@ -49,7 +49,7 @@ Następnie edytowałam plik konfiguracyjny (`winlogbeat.yml`), w którym należa
   * Kibana
   ```
   setupt.kibana:
-  host: [https://192.168.10.108/app/kibana]
+  host: "https://192.168.10.108/app/kibana"
   ```
   * Logstash
   ```
@@ -78,19 +78,21 @@ W zakładce Discover znajduje się zestawienie i szczegóły dotyczące tych log
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/win_kibana.PNG)
 
-Po rozwinięciu można sprawdzić takie cechy, jak:...Znaczna większość dotyczy `event ID 10`, czyli `Process accessed`, czyli gdy jakiś proces otwiera nowy proces. Warto w tym wypadku sprawdzić `SourceImage` oraz `TargetImage`. Zagrożeniem może być najczęściej, gdy zobaczymy, że uruchomiany był przez PowerShella Lsass.exe, co może być dokonane w celu kradzieży poświadczeń do ataktu Pass-the-Hash. Sytuacja taka może wyglądać np. gdy targetem jest lsass.exe, a sourcem mimikatz. W moim wypadku proces ten zawsze uruchamiany był z systemowego pliku svchost.exe.
+## Przeanalizować zawartość informacyjną logów sysmon pod kątem wykrywania zagrożeń w cyberprzestrzeni
+
+Po rozwinięciu szczegółów logów można sprawdzić takie cechy, jak:...Znaczna większość dotyczy `event ID 10`, czyli `Process accessed`, czyli gdy jakiś proces otwiera nowy proces. Warto w tym wypadku sprawdzić `SourceImage` oraz `TargetImage`. Zagrożeniem może być najczęściej, gdy zobaczymy, że uruchomiany był przez PowerShella Lsass.exe, co może być dokonane w celu kradzieży poświadczeń do ataktu Pass-the-Hash. Sytuacja taka może wyglądać np. gdy targetem jest lsass.exe, a sourcem mimikatz. W moim wypadku proces ten zawsze uruchamiany był z systemowego pliku svchost.exe.
 
 
 
 # Zadanie 2
 
-## Utworzenie maszyny wirtualnej
+## W ramach możliwości konta Azure for Students ustanowić darmową maszynę wirtualną z systemem operacyjnym Linux
 
 W ramach możliwości konta Azure for Students utworzyłam maszynę wirtualną z systemem Linux Ubuntu 16.04.
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/create_vm.PNG)
 
-Na etapie tworzenia maszyny jest możliwość ustawienia opcji logowania przy użyciu klucza SSH.
+Na etapie tworzenia maszyny jest możliwość (na dodatek zalecana przez witrynę) ustawienia opcji logowania przy użyciu nie hasła, a klucza SSH.
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/log_with_ssh.PNG)
 
@@ -100,9 +102,11 @@ Następnie zalogowałam się do maszyny za pośrednictwem protokołu SSH.
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/login_successfull.PNG)
 
-## Firewall
+## Skonfigurować reguły firewalla
 
-Wyświetliłam bieżący łańcuch firewalla komendą `iptables -S`
+### Dopuścić ruch na porcie 80 oraz 443 (HTTP) z dowolnej maszyny
+
+Wyświetliłam bieżący status firewalla komendą `iptables -S`
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/iptables_s.PNG)
 
@@ -118,8 +122,9 @@ Sprawdziłam aktualnie akceptowane porty poleceniem `sudo iptables -L -n`
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/current_80_443.PNG)
 
+### Dopuścić ruch dla usługi SSH tylko ze swojej maszyny
 
-Dopuszczenie ruchu SSH tylko dla mojej maszyny wykonałam analogicznie, do poprzedniej części zadania, z uwzględnieniem portu usługi SSH (`port 22`) oraz source adresu IP (`168.62.40.165`).
+Dopuszczenie ruchu SSH tylko dla mojej maszyny wykonałam analogicznie do poprzedniej części zadania, z uwzględnieniem portu usługi SSH (`port 22`) oraz adresu IP źródła (`168.62.40.165`).
 Użyłam więc komendy:
 ```
 sudo iptables -A INPUT -p tcp -s 88.156.140.65 -m tcp --dport 22 -j ACCEPT
@@ -128,13 +133,18 @@ I ponownie wyświetliłam bieżący łańcuch firewalla.
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/allow_SSH.PNG)
 
+### Zablokować wszystkie nieużywane porty
+
 Żeby zablokować wszystkie nieużywane porty (czyli pozostałe porty), należy użyć komend:
 ```
 sudo iptables -P INPUT DROP
 sudo iptables -P OUTPUT DROP
 ```
 
-MQTT
+### Dopuścić ruch dla protokołu MQTT
+
+MQTT to protokół transmisji danych, umożliwiający komunikację pomiędzy systemami za pomocą serwera pośredniczącego. Broker domyślnie słucha na porcie 1883
+
 ```
 sudo iptables -A INPUT -p tcp -m tcp --dport 1883 -j ACCEPT
 sudo iptables -A INPUT -p tcp -m tcp --dport 8883 -j ACCEPT
@@ -143,6 +153,7 @@ sudo iptables -A OUTPUT -p tcp -m tcp --dport 8883 -j ACCEPT
 ```
 
 ## Best Practices hardeningu systemu
+Przykłady:
 * silne loginy i hasła (minimum 8 znaków, w tym duże znaki i znaki specjalne)
 * używanie niestandardowego portu dla SSH (zamiast 22)
 * zablokowanie nieużywanych portów
@@ -155,8 +166,32 @@ sudo iptables -A OUTPUT -p tcp -m tcp --dport 8883 -j ACCEPT
 * dozwolenie dostępu do SSH tylko dla określonego adresu IP
 * regularne aktualizacje
 
+### SSH certificates logins
+Użyłam następującej komendy do stworzenia pary kluczy SSH przy użyciu szyfrowania RSA i długości bitowej 4096:
+```
+ssh-keygen -m PEM -t rsa -b 4096
+```
+Klucze te domyślnie przechowywane są w katalogu ~/.ssh. Dodatkowo możemy (opcjonalnie) utowrzyć hasło dla klucza publicznego.
+
+Następnie wyświetliłam klucz poleceniem:
+```
+cat ~/.ssh/id_rsa.pub
+```
+Klucz podałam na etapie tworzenia maszyny wirtualnej i od początku logowałam się przy jego użyciu. Można jednak przejść z logowania hasłem na logowanie przy użyciu kluczy SSH podczas użytkowania stworzonej już maszyny.
+Należy zmienić rodzaj uwierzytelnienia w pliku `sshd_config`.
+```
+sudo nano /etc/ssh/sshd_config
+```
+![image]()
+
+Następnie używamy polecenia:
+```
+sudo service ssh restart
+```
+
 ### Fail2Ban
-Fail2Ban to 
+Fail2Ban to program, który działa w tle, analizuje logi wybranych aplikacji, i na podstawie zdefiniowanych reguł szuka „złych zachowań” (np. nieudana próba logowania, brute force) i, jeśli natrafi na takie działania, to podejmuje akcje – blokuje.
+
 Instalujemy go komendą: `sudo apt-get install fail2ban`.
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/fail2ban_install.PNG)
@@ -173,11 +208,11 @@ sudo nano /etc/fail2ban/jail.local
 
 Podstawowymi opcjami, na które należałoby zwrócić uwagę w podstawowej konfiguracji są:
 
-* ignoreip - adresy, które wyłączone są z zasad fail2ban (od razu ustawiony
+* ignoreip - adresy, które wyłączone są z zasad fail2ban (domyślnie podany jest tutaj localhost)
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/ignore_ip.PNG)
 
-* bantime - określa jak długo ( w sekundach) ban będzie aktywny
+* bantime - określa jak długo (w sekundach) ban będzie aktywny
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/bantime.PNG)
 
@@ -219,6 +254,5 @@ Uzyłam następujących komend dopisujących reguły do firewalla:
 * `sudo iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP` - zablokowanie pakietów z flagą XMAS
 * `sudo iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP` - zablokowanie pakietów z flagą NULL
 * `sudo iptables -A INPUT -p icmp -m limit --limit 2/second --limit-burst 2 -j ACCEPT` - limit ICMP
-
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/block_packets.PNG)
