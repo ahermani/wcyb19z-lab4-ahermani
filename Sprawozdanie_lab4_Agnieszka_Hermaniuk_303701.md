@@ -242,7 +242,7 @@ sudo iptables -A OUTPUT -p tcp --dport 22 -j DROP
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/fail2ban_iptables.PNG)
 
 ### Debsums
-Debsums to narzędzie pozwalające zweryfikować spójność zainstalowanych plików pakietów, pod względem sum kontrolnych dostarczonych przez pakiet lub wygenerowanych z archiwum .deb. Dzięki niemu możemy stwierdzić, czy pliki na naszym dysku zostały zmodyfikowane.
+Debsums to narzędzie pozwalające zweryfikować spójność zainstalowanych plików pakietów, pod względem sum kontrolnych dostarczonych przez pakiet lub wygenerowanych z archiwum .deb. Dzięki niemu możemy stwierdzić, czy pliki na naszym dysku zostały zmodyfikowane, co raczej ciężko jest badać własnoręcznie.
 
 Zainstalowałam narzędzie komendą: `sudo apt-get install debsums`. 
 
