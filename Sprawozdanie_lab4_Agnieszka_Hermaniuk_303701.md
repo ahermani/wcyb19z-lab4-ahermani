@@ -254,9 +254,10 @@ Fragment wyniku komendy `sudo debsums`:
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/sudo_debsums.PNG)
 
-### Blokowanie pakietów z flagami 
-Zablokowałam wysyłanie pakietów SYN, XMAS i z flagą NULL, a także ustawiłam limit na przesyłanie pakietów ICMP echo broadcast.
-Uzyłam następujących komend dopisujących reguły do firewalla:
+### Blokowanie pakietów z flagami
+Wysyłanie pakietów z falgami SYN, XMAS i NULL to częste ataki przeprowadzane w celu wykrycia owtartych portów, udostępnianych usług, systemu operacyjnego. Pomaga też atakującym w rozpoznaniu topologii sieci lub zablokowaniu usług serwera. Dlatego ważna jest obrona przed nimi.
+Polega na zablokowaniu możliwości wysyłania tych pakietów, czy też np. ustawieniu limitu na przesyłanie pakietów ICMP.
+Użyłam następujących komend dopisujących reguły do firewalla:
 * `sudo iptables -A INPUT -p tcp ! --syn -m state --state NEW -j DROP` - zablokowanie pakietów SYN
 * `sudo iptables -A INPUT -p tcp --tcp-flags ALL ALL -j DROP` - zablokowanie pakietów z flagą XMAS
 * `sudo iptables -A INPUT -p tcp --tcp-flags ALL NONE -j DROP` - zablokowanie pakietów z flagą NULL
