@@ -263,3 +263,4 @@ Uzyłam następujących komend dopisujących reguły do firewalla:
 * `sudo iptables -A INPUT -p icmp -m limit --limit 2/second --limit-burst 2 -j ACCEPT` - limit ICMP
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/block_packets.PNG)
+
