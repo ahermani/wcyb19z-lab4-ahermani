@@ -29,7 +29,7 @@ Widok pliku:
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/sysmon_file.PNG)
 
-Zapisany plik mogłam otworzyć w Sysmon View, które umożliwia lepszą wizualizację, a tym samym analizę logów, posiadając takie opcje jak: korelowanie i grupowanie zebranych logów na podstawie ich nazw, identyfikatorów GUID czy czas powstania wydarzeń, zbudowanie drzewka hierarchii, czy też przedstawianie wyników na mapie na podstawie geolokalizacji adresów IP (bardziej czasochłonna opcja).
+Zapisany plik mogłam otworzyć w Sysmon View, które umożliwia lepszą wizualizację, a tym samym analizę logów, posiadając takie opcje jak: korelowanie i grupowanie zebranych logów na podstawie ich nazw, identyfikatorów GUID czy czasu powstania wydarzeń, zbudowanie drzewka hierarchii, czy też przedstawianie wyników na mapie na podstawie geolokalizacji adresów IP (bardziej czasochłonna opcja).
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/all_events_log.PNG)
 
@@ -74,13 +74,13 @@ start-service winlogbeat
 
 Do Kibany przesłane zostały logi z Sysmona, co można było zauważyć już w zakładce `Dashboard`.
 
-W zakładce Discover znajduje się zestawienie i szczegóły dotyczące tych logów. 
+W zakładce Discover znajdują się zestawienie i szczegóły dotyczące tych logów. 
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/win_kibana.PNG)
 
 ## Przeanalizować zawartość informacyjną logów sysmon pod kątem wykrywania zagrożeń w cyberprzestrzeni
 
-Po rozwinięciu szczegółów logów można sprawdzić takie cechy, jak:...Znaczna większość dotyczy `event ID 10`, czyli `Process accessed`, czyli gdy jakiś proces otwiera nowy proces. Warto w tym wypadku sprawdzić `SourceImage` oraz `TargetImage`. Zagrożeniem może być najczęściej, gdy zobaczymy, że uruchomiany był przez PowerShella Lsass.exe, co może być dokonane w celu kradzieży poświadczeń do ataktu Pass-the-Hash. Sytuacja taka może wyglądać np. gdy targetem jest lsass.exe, a sourcem mimikatz. W moim wypadku proces ten zawsze uruchamiany był z systemowego pliku svchost.exe.
+W Discover można odpowiednio filtrować dane według różnych pól, osi czasu itp. Po rozwinięciu szczegółów logów można sprawdzić takie informacje, jak: czas logów, nazwę hosta i jego system operacyjny, nazwę i ID eventu, jego rodzaj (np. informacyjny) itd. Znaczna większość zebranych u mnoie danych dotyczy `event ID 10`, czyli `Process accessed`, czyli gdy jakiś proces otwiera nowy proces. Warto w tym wypadku sprawdzić `SourceImage` oraz `TargetImage`. Zagrożeniem może być najczęściej, gdy zobaczymy, że uruchomiany był przez PowerShella Lsass.exe, co może być dokonane w celu kradzieży poświadczeń do ataktu Pass-the-Hash. Sytuacja taka może wyglądać np. gdy targetem jest lsass.exe, a sourcem mimikatz. W moim wypadku proces ten zawsze uruchamiany był z systemowego pliku svchost.exe.
 
 
 
