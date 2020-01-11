@@ -124,22 +124,23 @@ Sprawdziłam aktualnie akceptowane porty poleceniem `sudo iptables -L -n`
 
 ### Dopuścić ruch dla usługi SSH tylko ze swojej maszyny
 
-Dopuszczenie ruchu SSH tylko dla mojej maszyny wykonałam analogicznie do poprzedniej części zadania, z uwzględnieniem portu usługi SSH (`port 22`) oraz adresu IP źródła (`168.62.40.165`).
+Dopuszczenie ruchu SSH tylko dla mojej maszyny wykonałam analogicznie do poprzedniej części zadania, z uwzględnieniem portu usługi SSH (`port 22`) oraz adresu IP źródła (`137.116.212.236`).
 Użyłam więc komendy:
 ```
-sudo iptables -A INPUT -p tcp -s 88.156.140.65 -m tcp --dport 22 -j ACCEPT
+sudo iptables -A INPUT -p tcp -s 137.116.212.236 -m tcp --dport 22 -j ACCEPT
 ```
 I ponownie wyświetliłam bieżący łańcuch firewalla.
 
-![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/allow_SSH.PNG)
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/allow_only_ssh.PNG)
 
 ### Zablokować wszystkie nieużywane porty
 
-Żeby zablokować wszystkie nieużywane porty (czyli pozostałe porty), należy użyć komend:
+Żeby zablokować wszystkie nieużywane porty (czyli pozostałe porty), należy użyć komendy zmieniającej defaultowe ustawienia firewalla:
 ```
 sudo iptables -P INPUT DROP
-sudo iptables -P OUTPUT DROP
 ```
+
+![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/drop_unused.PNG)
 
 ### Dopuścić ruch dla protokołu MQTT
 
@@ -212,7 +213,7 @@ Teraz należy skonfigurować plik w edytorze
 sudo nano /etc/fail2ban/jail.local
 ```
 
-Podstawowymi opcjami, na które należałoby zwrócić uwagę w podstawowej konfiguracji są:
+Głównymi opcjami, na które należałoby zwrócić uwagę w podstawowej konfiguracji są:
 
 * ignoreip - adresy, które wyłączone są z zasad fail2ban (domyślnie podany jest tutaj localhost)
 
