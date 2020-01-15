@@ -9,7 +9,7 @@ Do realizacji zadania zainstalowałam na VirtualBoxie wirualnego hosta Security 
 ## Skonfigurować generowanie logów systemowych systemu Windows - Sysmon
 
 Sysmona zainstalowałam, pobierając folder ze strony: https://github.com/SwiftOnSecurity/sysmon-config .
-Następnie skonfigurowałam plik (`sysmonconfig-export.xml` - według tego tutoriala: [sysmon setup(https://www.youtube.com/watch?v=vqGoXQEK8pA)) i zainstalowałam Sysmona komendą:
+Następnie skonfigurowałam plik (`sysmonconfig-export.xml` - według tego tutoriala: [sysmon setup](https://www.youtube.com/watch?v=vqGoXQEK8pA)) i zainstalowałam Sysmona komendą:
 ```
 sysmon.exe -accepteula -i sysmonconfig-export.xml
 ```
