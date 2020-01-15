@@ -29,7 +29,7 @@ Widok pliku:
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/sysmon_file.PNG)
 
-Zapisany plik mogłam otworzyć w Sysmon View, które umożliwia lepszą wizualizację, a tym samym analizę logów, posiadając takie opcje jak: korelowanie i grupowanie zebranych logów na podstawie ich nazw, identyfikatorów GUID czy czasu powstania wydarzeń, zbudowanie drzewka hierarchii, czy też przedstawianie wyników na mapie na podstawie geolokalizacji adresów IP (bardziej czasochłonna opcja).
+Zapisany plik mogłam otworzyć w Sysmon View, który umożliwia lepszą wizualizację, a tym samym analizę logów, posiadając takie opcje jak: korelowanie i grupowanie zebranych logów na podstawie ich nazw, identyfikatorów GUID czy czasu powstania wydarzeń, zbudowanie drzewka hierarchii, czy też przedstawianie wyników na mapie na podstawie geolokalizacji adresów IP (bardziej czasochłonna opcja).
 
 ![image](https://github.com/wcyb19z-lab/wcyb19z-lab4-ahermani/blob/screenshots/all_events_log.PNG)
 
@@ -69,6 +69,9 @@ Zwróciła ona `Config OK`, zatem można było przejść do uruchomienia usługi
 ```
 start-service winlogbeat 
 ```
+Ze względu na blokowanie komunikacji między Security Onion a Windowsem:
+* Wyłączyłam firewalla na Windows (w ustawieniach)
+* Wyłączyłam firewalla na Security Onion (komenda: `sudo ufw disable`
 
 ## Zaobserowować działanie za pomocą UI dostępnego w Security Onion - Kibana
 
